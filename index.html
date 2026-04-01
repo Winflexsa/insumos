@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insumos — Winflex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117; --bg2:#161b26; --bg3:#1d2333; --line:#252d40;
+  --text:#dde3f0; --muted:#5a6a8a; --dim:#8898b8;
+  --accent:#f5a623; --accent2:#c8841a;
+  --red:#e74c3c; --red-bg:#2a1515; --red-border:#4a2020;
+  --green:#27ae60; --green-bg:#0f2a1a; --green-border:#1a4a2a;
+  --blue:#3b82f6; --blue-bg:#0f1e35; --blue-border:#1e3a5a;
+  --purple:#8b5cf6;
+  --tf:#9b73c9; --pl:#4a9eca; --ex:#e07b00; --rb:#27ae60; --mt:#e55; --cf:#e91e8c;
+  --r:10px; --r-sm:6px;
+  --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
+  --shadow:0 4px 20px rgba(0,0,0,.4);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;line-height:1.5}
+button{font-family:var(--font);cursor:pointer}
+input,select,textarea{font-family:var(--font)}
+a{color:inherit;text-decoration:none}
+
+/* ── HEADER ─────────────────────────────────────── */
+#header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(13,17,23,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  height:56px;
+}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--accent);color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:17px;letter-spacing:-1px;
+}
+.logo-name{font-weight:800;font-size:15px;letter-spacing:.3px}
+.logo-sub{font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1}
+
+nav{display:flex;gap:3px;background:var(--bg3);border-radius:var(--r);padding:3px;overflow-x:auto}
+.nb{
+  display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:7px;
+  background:none;border:none;color:var(--dim);font-size:13px;font-weight:600;
+  transition:all .15s;white-space:nowrap;
+}
+.nb:hover{color:var(--text);background:var(--line)}
+.nb.on{background:var(--accent);color:#000}
+.nb .bx{
+  background:var(--red);color:#fff;border-radius:8px;
+  padding:1px 5px;font-size:10px;font-family:var(--mono);font-weight:700;
+}
+.nb.on .bx{background:rgba(0,0,0,.25);color:#000}
+
+/* ── MAIN ───────────────────────────────────────── */
+#main{max-width:1140px;margin:0 auto;padding:22px 20px 60px}
+.page{display:none}.page.on{display:block}
+
+/* ── PAGE TITLE ─────────────────────────────────── */
+.ptitle{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.psub{font-size:12px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.phead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+
+/* ── STAT PILLS ─────────────────────────────────── */
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.stat{
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px 16px;flex:1;min-width:100px;
+}
+.stat-n{font-size:26px;font-weight:800;font-family:var(--mono);line-height:1}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.stat.red .stat-n{color:var(--red)}
+.stat.green .stat-n{color:var(--green)}
+.stat.amber .stat-n{color:var(--accent)}
+
+/* ── FILTERS ─────────────────────────────────────── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.search-wrap{position:relative;flex:1;min-width:160px}
+.search-wrap input{
+  width:100%;background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:8px 12px 8px 34px;color:var(--text);font-size:13px;
+  transition:border-color .15s;outline:none;
+}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap::before{
+  content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:16px;pointer-events:none;
+}
+.filt-btn{
+  padding:7px 12px;border-radius:var(--r-sm);background:var(--bg2);
+  border:1px solid var(--line);color:var(--dim);font-size:12px;font-weight:600;
+  transition:all .15s;
+}
+.filt-btn:hover{border-color:var(--muted);color:var(--text)}
+.filt-btn.on{border-color:var(--accent);background:rgba(245,166,35,.12);color:var(--accent)}
+
+/* ── TABLE ───────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{background:var(--bg3)}
+th{
+  padding:10px 14px;text-align:left;font-size:11px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.6px;
+  border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{
+  padding:10px 14px;border-bottom:1px solid var(--line);
+  font-size:13px;vertical-align:middle;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--bg3)}
+.td-name{font-weight:600;max-width:260px;line-height:1.35}
+.td-freq{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.td-date{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* ── SECTOR TAGS ─────────────────────────────────── */
+.tag{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;
+}
+.tag-tf{background:#9b73c920;color:#c4a8f0;border:1px solid #9b73c940}
+.tag-pl{background:#4a9eca20;color:#87c9ee;border:1px solid #4a9eca40}
+.tag-ex{background:#e07b0020;color:#ffaa44;border:1px solid #e07b0040}
+.tag-rb{background:#27ae6020;color:#6ed897;border:1px solid #27ae6040}
+.tag-mt{background:#e5555520;color:#ff9090;border:1px solid #e5555540}
+.tag-cf{background:#e91e8c20;color:#f48ec9;border:1px solid #e91e8c40}
+
+/* ── STATUS ──────────────────────────────────────── */
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:20px;
+  font-size:11px;font-weight:700;font-family:var(--mono);
+  white-space:nowrap;
+}
+.pill-comprar{background:var(--red-bg);color:#ff7070;border:1px solid var(--red-border)}
+.pill-ok{background:var(--green-bg);color:#6ed897;border:1px solid var(--green-border)}
+.pill-sin{background:var(--bg3);color:var(--muted);border:1px solid var(--line)}
+.pill-pronto{background:#2a2010;color:#ffcc55;border:1px solid #4a3a10}
+
+/* ── ALERT CARDS ─────────────────────────────────── */
+.alert-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:12px;
+}
+.acard{
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px;
+  border-left:3px solid var(--red);
+  transition:transform .15s,border-color .15s;
+  position:relative;overflow:hidden;
+}
+.acard::before{
+  content:'';position:absolute;top:0;right:0;width:60px;height:60px;
+  background:var(--red);opacity:.04;border-radius:0 0 0 60px;
+}
+.acard:hover{transform:translateY(-2px);border-color:var(--red)}
+.acard.pronto{border-left-color:#ffcc55}
+.acard.pronto::before{background:#ffcc55}
+.acard-name{font-weight:700;font-size:14px;line-height:1.3;margin-bottom:8px;padding-right:8px}
+.acard-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.acard-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--line);
+}
+.acard-prov{font-size:11px;color:var(--dim);font-family:var(--mono)}
+.acard-resp{font-size:11px;color:var(--muted)}
+
+/* ── FORM ─────────────────────────────────────────── */
+.form-card{
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--r);padding:24px;max-width:600px;
+}
+.form-title{font-size:16px;font-weight:700;margin-bottom:18px}
+.form-row{display:grid;gap:14px;margin-bottom:14px}
+.form-row.col2{grid-template-columns:1fr 1fr}
+.form-row.col3{grid-template-columns:1fr 1fr 1fr}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.finput,.fselect,.ftextarea{
+  width:100%;background:var(--bg3);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;
+  transition:border-color .15s;outline:none;
+}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent)}
+.fselect{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6a8a' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.finput[readonly]{color:var(--dim);cursor:not-allowed}
+.ftextarea{resize:vertical;min-height:70px}
+.form-hint{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px}
+
+.btn{
+  padding:9px 20px;border-radius:var(--r-sm);border:none;
+  font-size:13px;font-weight:700;transition:all .15s;
+}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.btn-danger:hover{background:#3a1515}
+.btn-ghost{background:var(--bg3);color:var(--dim);border:1px solid var(--line)}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+
+/* ── TOAST ───────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:20px;right:20px;z-index:999;
+  background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px 16px;font-size:13px;font-weight:600;
+  box-shadow:var(--shadow);transform:translateY(80px);opacity:0;
+  transition:all .3s;pointer-events:none;max-width:300px;
+}
+#toast.show{transform:none;opacity:1}
+#toast.ok{border-color:var(--green);color:var(--green)}
+#toast.err{border-color:var(--red);color:var(--red)}
+
+/* ── EMPTY ───────────────────────────────────────── */
+.empty{
+  text-align:center;padding:50px 20px;color:var(--muted);
+  font-size:14px;
+}
+.empty-icon{font-size:40px;margin-bottom:10px}
+
+/* ── HISTORIAL ───────────────────────────────────── */
+.hist-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 7px;border-radius:4px;
+  font-size:11px;font-family:var(--mono);
+  background:var(--blue-bg);color:#87b4f0;border:1px solid var(--blue-border);
+}
+.del-btn{
+  background:none;border:none;color:var(--muted);font-size:14px;
+  padding:3px 6px;border-radius:4px;transition:all .15s;
+}
+.del-btn:hover{background:var(--red-bg);color:var(--red)}
+
+/* ── CONFIG ──────────────────────────────────────── */
+.cfg-section{margin-bottom:24px}
+.cfg-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.bin-input-row{display:flex;gap:8px;align-items:center}
+.bin-status{font-size:11px;font-family:var(--mono);padding:4px 8px;border-radius:4px}
+.bin-ok{background:var(--green-bg);color:#6ed897;border:1px solid var(--green-border)}
+.bin-err{background:var(--red-bg);color:#ff9090;border:1px solid var(--red-border)}
+
+/* ── LOADING ───────────────────────────────────── */
+#loading{
+  position:fixed;inset:0;background:var(--bg);z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--line);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* ── RESPONSIVE ──────────────────────────────────── */
+@media(max-width:640px){
+  #header{padding:0 12px}
+  .logo-name,.logo-sub{display:none}
+  #main{padding:14px 12px 60px}
+  .form-row.col2,.form-row.col3{grid-template-columns:1fr}
+  .nb{padding:6px 10px;font-size:12px}
+  .stat-n{font-size:20px}
+}
+
+/* ── SECTOR INDICATOR BAR ────────────────────────── */
+.sector-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;
+}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="logo-icon" style="width:48px;height:48px;border-radius:12px;font-size:22px;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#000;font-weight:800">W</div>
+  <div class="spinner"></div>
+  <div class="loading-text">Cargando insumos…</div>
+</div>
+
+<div id="app" style="display:none">
+  <div id="header">
+    <div class="logo">
+      <div class="logo-icon">W</div>
+      <div>
+        <div class="logo-name">Winflex S.A.</div>
+        <div class="logo-sub">Gestión de Insumos</div>
+      </div>
+    </div>
+    <nav>
+      <button class="nb on" onclick="goTo('alertas')">🚨 Alertas <span class="bx" id="badge-alertas">0</span></button>
+      <button class="nb" onclick="goTo('insumos')">📦 Insumos</button>
+      <button class="nb" onclick="goTo('compra')">🛒 Registrar</button>
+      <button class="nb" onclick="goTo('historial')">📋 Historial</button>
+      <button class="nb" onclick="goTo('config')">⚙️</button>
+    </nav>
+  </div>
+
+  <div id="main">
+
+    <!-- ── ALERTAS ─────────────────────────── -->
+    <div class="page on" id="pg-alertas">
+      <div class="phead">
+        <div>
+          <div class="ptitle">🚨 Alertas de compra</div>
+          <div class="psub" id="alertas-sub">—</div>
+        </div>
+      </div>
+      <div class="stats" id="alertas-stats"></div>
+      <div class="filters">
+        <button class="filt-btn on" onclick="filterAlertSector(this,'')">Todos</button>
+        <button class="filt-btn" onclick="filterAlertSector(this,'Termoformado')">Termoformado</button>
+        <button class="filt-btn" onclick="filterAlertSector(this,'Planta')">Planta</button>
+        <button class="filt-btn" onclick="filterAlertSector(this,'Extrusion')">Extrusión</button>
+        <button class="filt-btn" onclick="filterAlertSector(this,'Rebobinado')">Rebobinado</button>
+        <button class="filt-btn" onclick="filterAlertSector(this,'Mantenimiento')">Mantenimiento</button>
+        <button class="filt-btn" onclick="filterAlertSector(this,'Confeccion')">Confección</button>
+      </div>
+      <div class="alert-grid" id="alertas-grid"></div>
+    </div>
+
+    <!-- ── INSUMOS ─────────────────────────── -->
+    <div class="page" id="pg-insumos">
+      <div class="phead">
+        <div>
+          <div class="ptitle">📦 Catálogo de insumos</div>
+          <div class="psub" id="insumos-sub">—</div>
+        </div>
+      </div>
+      <div class="filters">
+        <div class="search-wrap"><input id="ins-search" type="text" placeholder="Buscar insumo…" oninput="renderInsumos()"></div>
+        <button class="filt-btn on" onclick="filterInsSector(this,'')">Todos</button>
+        <button class="filt-btn" onclick="filterInsSector(this,'Termoformado')">TF</button>
+        <button class="filt-btn" onclick="filterInsSector(this,'Planta')">Planta</button>
+        <button class="filt-btn" onclick="filterInsSector(this,'Extrusion')">Ext</button>
+        <button class="filt-btn" onclick="filterInsSector(this,'Rebobinado')">Reb</button>
+        <button class="filt-btn" onclick="filterInsSector(this,'Mantenimiento')">Mant</button>
+        <button class="filt-btn" onclick="filterInsSector(this,'Confeccion')">Conf</button>
+        <button class="filt-btn" id="filt-solo-alertas" onclick="toggleSoloAlertas(this)">Solo 🔴</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Insumo</th>
+              <th>Sector</th>
+              <th>Unidad</th>
+              <th>Frecuencia</th>
+              <th>Última compra</th>
+              <th>Próxima compra</th>
+              <th>Estado</th>
+              <th>Responsable</th>
+              <th>Proveedor</th>
+            </tr>
+          </thead>
+          <tbody id="ins-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── REGISTRAR COMPRA ────────────────── -->
+    <div class="page" id="pg-compra">
+      <div class="phead">
+        <div>
+          <div class="ptitle">🛒 Registrar compra</div>
+          <div class="psub">Completar cuando se realiza una compra de insumo</div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-row col2">
+          <div>
+            <label>Fecha de compra</label>
+            <input class="finput" type="date" id="f-fecha">
+          </div>
+          <div>
+            <label>Insumo</label>
+            <select class="fselect" id="f-insumo" onchange="onInsumoChange()">
+              <option value="">— Seleccionar —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row col3">
+          <div>
+            <label>Unidad</label>
+            <input class="finput" type="text" id="f-unidad" readonly placeholder="Auto">
+          </div>
+          <div>
+            <label>Cantidad</label>
+            <input class="finput" type="number" id="f-cantidad" min="0" step="any" placeholder="0">
+          </div>
+          <div>
+            <label>Proveedor</label>
+            <input class="finput" type="text" id="f-proveedor" placeholder="Proveedor">
+            <div class="form-hint" id="f-prov-hint"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>Observación <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+            <textarea class="ftextarea" id="f-obs" placeholder="Número de factura, precio, notas…"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="btn btn-primary" id="btn-guardar" onclick="guardarCompra()">✓ Guardar compra</button>
+          <button class="btn btn-ghost" onclick="resetForm()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORIAL ───────────────────────── -->
+    <div class="page" id="pg-historial">
+      <div class="phead">
+        <div>
+          <div class="ptitle">📋 Historial de compras</div>
+          <div class="psub" id="hist-sub">—</div>
+        </div>
+      </div>
+      <div class="filters">
+        <div class="search-wrap"><input id="hist-search" type="text" placeholder="Buscar insumo o proveedor…" oninput="renderHistorial()"></div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Insumo</th>
+              <th>Cantidad</th>
+              <th>Proveedor</th>
+              <th>Observación</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CONFIG ──────────────────────────── -->
+    <div class="page" id="pg-config">
+      <div class="phead">
+        <div>
+          <div class="ptitle">⚙️ Configuración</div>
+          <div class="psub">JSONBin storage · ajustes del sistema</div>
+        </div>
+      </div>
+      <div class="form-card" style="max-width:520px">
+        <div class="cfg-section">
+          <div class="cfg-label">JSONBin — Bin ID</div>
+          <div class="bin-input-row">
+            <input class="finput" type="text" id="cfg-binid" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx" style="flex:1;font-family:var(--mono)">
+            <button class="btn btn-primary" onclick="saveBinId()">Guardar</button>
+          </div>
+          <div style="margin-top:6px"><span class="bin-status" id="bin-status">—</span></div>
+          <div class="form-hint" style="margin-top:6px">
+            Creá un bin gratis en <strong>jsonbin.io</strong> y pegá el ID acá.<br>
+            El bin debe ser <strong>público</strong> o usar una API key.
+          </div>
+        </div>
+        <div class="cfg-section">
+          <div class="cfg-label">API Key (opcional)</div>
+          <input class="finput" type="password" id="cfg-apikey" placeholder="$2b$10$…">
+          <div class="form-hint">Solo necesaria si el bin es privado.</div>
+          <button class="btn btn-ghost" style="margin-top:8px" onclick="saveApiKey()">Guardar API Key</button>
+        </div>
+        <div class="cfg-section">
+          <div class="cfg-label">Estado de conexión</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="testConnection()">🔌 Testear conexión</button>
+            <button class="btn btn-ghost" onclick="forceSync()">🔄 Forzar sync</button>
+          </div>
+        </div>
+        <div class="cfg-section">
+          <div class="cfg-label">Acerca de</div>
+          <div style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.7">
+            Winflex Insumos v1.0<br>
+            79 insumos · 6 sectores · JSONBin storage<br>
+            Responsables: JS = Jonathan · JD = Juan D. · JM = Juan M.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  BASE DE DATOS DE INSUMOS (desde Excel)
+// ══════════════════════════════════════════════
+const INSUMOS_BASE = [
+  {id:1,  nombre:"Agua destilada",                       sector:"Termoformado", unidad:"lts",      frecMeses:1.5,  responsable:"JS",    proveedor:"Torbidoni"},
+  {id:2,  nombre:"Cortante E900/T900",                   sector:"Termoformado", unidad:"uds",      frecMeses:2.5,  responsable:"JD/JS", proveedor:"Corral y cia"},
+  {id:3,  nombre:"Cortante S900",                        sector:"Termoformado", unidad:"uds",      frecMeses:2.5,  responsable:"JD/JS", proveedor:"Corral y cia"},
+  {id:4,  nombre:"Cortante F40/F41/F43/F44",             sector:"Termoformado", unidad:"uds",      frecMeses:2.5,  responsable:"JD/JS", proveedor:"Corral y cia"},
+  {id:5,  nombre:"Cortante F60/61/63",                   sector:"Termoformado", unidad:"uds",      frecMeses:2.5,  responsable:"JD/JS", proveedor:"Corral y cia"},
+  {id:6,  nombre:"Cortante F50/F51",                     sector:"Termoformado", unidad:"uds",      frecMeses:2.5,  responsable:"JD/JS", proveedor:"Corral y cia"},
+  {id:7,  nombre:"Sufridera E900/T900",                  sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:8,  nombre:"Sufridera S900",                       sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:9,  nombre:"Sufridera F40/F41/F43/F44",            sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:10, nombre:"Sufridera F60/61/63",                  sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:11, nombre:"Sufridera F50",                        sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:12, nombre:"Contrasufridera E900/T900",            sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:13, nombre:"Contrasufridera S900",                 sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:14, nombre:"Contrasufridera F40/F41/F43/F44",      sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:15, nombre:"Contrasufridera F60/61/63",            sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:16, nombre:"Contrasufridera F50",                  sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Tectool"},
+  {id:17, nombre:"Cuerda Oring 5,33",                    sector:"Termoformado", unidad:"mts",      frecMeses:6,    responsable:"JS",    proveedor:"GB rodamientos"},
+  {id:18, nombre:"Service Compresor",                    sector:"Planta",       unidad:"uds",      frecMeses:12,   responsable:"JM/JS", proveedor:"Air Matic"},
+  {id:19, nombre:"Service Secador de Aire",              sector:"Planta",       unidad:"uds",      frecMeses:12,   responsable:"JM/JS", proveedor:"Air Matic"},
+  {id:20, nombre:"Service Transformador",                sector:"Planta",       unidad:"uds",      frecMeses:12,   responsable:"JM/JS", proveedor:"Cambiasso"},
+  {id:21, nombre:"Bomba de vacio Busch",                 sector:"Termoformado", unidad:"uds",      frecMeses:12,   responsable:"JM/JS", proveedor:"Busch"},
+  {id:22, nombre:"Conos 3\" (Øint:77/e:10/l:2000)",      sector:"Planta",       unidad:"kg",       frecMeses:1.5,  responsable:"JS",    proveedor:"Esmerila"},
+  {id:23, nombre:"Conos 6\" (Øint:152/e:15/l:305)",      sector:"Planta",       unidad:"uds",      frecMeses:6,    responsable:"JS",    proveedor:"Esmerila"},
+  {id:24, nombre:"Cinta Cristal (a:48mm/L:100m)",        sector:"Planta",       unidad:"cajas",    frecMeses:2,    responsable:"JS",    proveedor:"Famyca"},
+  {id:25, nombre:"Cinta Roja (a:48mm/L:100m)",           sector:"Planta",       unidad:"cajas",    frecMeses:2,    responsable:"JS",    proveedor:"Famica"},
+  {id:26, nombre:"Flejes apilador",                      sector:"Termoformado", unidad:"mts",      frecMeses:6,    responsable:"JM/JS", proveedor:"Flejes Kruger"},
+  {id:27, nombre:"Cuchillas refilado",                   sector:"Rebobinado",   unidad:"cajas",    frecMeses:3,    responsable:"JS",    proveedor:"Proartec"},
+  {id:28, nombre:"Pegamento Loctite",                    sector:"Rebobinado",   unidad:"tambor",   frecMeses:0.5,  responsable:"JS",    proveedor:"Quimica del caucho"},
+  {id:29, nombre:"Diluyente Laminado",                   sector:"Rebobinado",   unidad:"tambor",   frecMeses:0.5,  responsable:"JS",    proveedor:"NH Tintas"},
+  {id:30, nombre:"Grasa Siliconada",                     sector:"Extrusion",    unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Zida"},
+  {id:31, nombre:"Grasa Grafitada",                      sector:"Extrusion",    unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Zida"},
+  {id:32, nombre:"Pallets",                              sector:"Planta",       unidad:"uds",      frecMeses:1,    responsable:"JS",    proveedor:"Pallet Sur"},
+  {id:33, nombre:"Vaselina",                             sector:"Extrusion",    unidad:"lts",      frecMeses:3,    responsable:"",      proveedor:""},
+  {id:34, nombre:"Registros de produccion (Todos)",      sector:"Planta",       unidad:"hojas",    frecMeses:6,    responsable:"JS",    proveedor:"Imprenta"},
+  {id:35, nombre:"Registros de bobinas Extrusion",       sector:"Extrusion",    unidad:"hojas",    frecMeses:3,    responsable:"JS",    proveedor:"Imprenta"},
+  {id:36, nombre:"Registro de Vacaciones",               sector:"Planta",       unidad:"hojas",    frecMeses:6,    responsable:"JS",    proveedor:"Imprenta"},
+  {id:37, nombre:"Etiquetas Grandes (a:100/l:150)",      sector:"Planta",       unidad:"rollos",   frecMeses:1,    responsable:"JS",    proveedor:"Label Trax"},
+  {id:38, nombre:"Etiquetas Chicas (a:25/l:80)",         sector:"Termoformado", unidad:"rollos",   frecMeses:1,    responsable:"JS",    proveedor:"Label Trax"},
+  {id:39, nombre:"Etiquetas Medianas (a:80/l:50)",       sector:"Termoformado", unidad:"rollos",   frecMeses:6,    responsable:"JS",    proveedor:"Label Trax"},
+  {id:40, nombre:"Ribbones (110mm-74M)",                 sector:"Planta",       unidad:"ribbones", frecMeses:1,    responsable:"JS",    proveedor:"Label Trax"},
+  {id:41, nombre:"Rollos de Carton Corrugado (h:1mts)",  sector:"Planta",       unidad:"uds",      frecMeses:3,    responsable:"JS",    proveedor:"Papelera Sur"},
+  {id:42, nombre:"Cajas E900 x300 (A:52/L:47/H:18)",    sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:43, nombre:"Cajas T900 x300 (A:52/L:27/H:18)",    sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:44, nombre:"Cajas Fruitpack (A:38,5/L:46,5/H:44)",sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Cartocor"},
+  {id:45, nombre:"Cajas Altas F40 (A:38/L:48,5/H:69,7)",sector:"Termoformado", unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:46, nombre:"Cajas 4 (A:24/L:62/H:16,5)",          sector:"Confeccion",   unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:47, nombre:"Cajas 1 (A:24/L:62/H:35)",            sector:"Confeccion",   unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:48, nombre:"Cajas 2 (A:37/L:52,5/H:13,5)",        sector:"Confeccion",   unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:49, nombre:"Cajas 9 (A:31,5/L:31,5/H:20)",        sector:"Confeccion",   unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:50, nombre:"Cajas Nueces (A:40,5/L:48,5/H:20)",   sector:"Confeccion",   unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:51, nombre:"Tapa Multilayer (A:31,5/L:31,5/H:30)",sector:"Confeccion",   unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:52, nombre:"Fondo Multilayer (A:30,5/L:30,5/H:28)",sector:"Confeccion",  unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Kraftliner"},
+  {id:53, nombre:"Electrodos 2,5mm punta azul",         sector:"Mantenimiento",unidad:"kg",       frecMeses:2,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:54, nombre:"Discos de Corte",                      sector:"Mantenimiento",unidad:"cajas",    frecMeses:2,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:55, nombre:"Hojas de cutter",                      sector:"Mantenimiento",unidad:"uds",      frecMeses:2,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:56, nombre:"Ciano",                                sector:"Mantenimiento",unidad:"uds",      frecMeses:2,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:57, nombre:"Cutter",                               sector:"Planta",       unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:58, nombre:"Guantes Moteados",                     sector:"Planta",       unidad:"pares",    frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:59, nombre:"Guantes de temperatura",               sector:"Planta",       unidad:"pares",    frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:60, nombre:"Guantes rojos para tinta",             sector:"Planta",       unidad:"pares",    frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:61, nombre:"Cepillos con cabo de madera",          sector:"Extrusion",    unidad:"cajas",    frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:62, nombre:"Viruta mediana",                       sector:"Extrusion",    unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:63, nombre:"W80 lubricante",                       sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:64, nombre:"Limpiacontactos",                      sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:65, nombre:"Manguera azul de aire 6mm",            sector:"Mantenimiento",unidad:"mts",      frecMeses:3,    responsable:"JM/JS", proveedor:"Conman Wilde"},
+  {id:66, nombre:"Manguera azul de aire 8mm",            sector:"Mantenimiento",unidad:"mts",      frecMeses:3,    responsable:"JM/JS", proveedor:"Conman Wilde"},
+  {id:67, nombre:"Manguera azul de aire 10mm",           sector:"Mantenimiento",unidad:"mts",      frecMeses:3,    responsable:"JM/JS", proveedor:"Conman Wilde"},
+  {id:68, nombre:"Bulones 6mm",                          sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:69, nombre:"Bulones 8mm",                          sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:70, nombre:"Bulones 10mm",                         sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:71, nombre:"Tuercas de 6mm",                       sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:72, nombre:"Tuercas de 8mm",                       sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:73, nombre:"Tuercas de 10mm",                      sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:74, nombre:"Arandelas de 6mm",                     sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:75, nombre:"Arandelas de 8mm",                     sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:76, nombre:"Arandelas de 10mm",                    sector:"Mantenimiento",unidad:"uds",      frecMeses:3,    responsable:"JM/JS", proveedor:"Bulonera Esteban"},
+  {id:77, nombre:"Trapos",                               sector:"Planta",       unidad:"Bolsones", frecMeses:1,    responsable:"JM",    proveedor:"Cañete"},
+  {id:78, nombre:"Productos de Limpieza",                sector:"Planta",       unidad:"uds",      frecMeses:1,    responsable:"JS",    proveedor:"Sin Datos"},
+  {id:79, nombre:"Resistencias de extrusoras",           sector:"Extrusion",    unidad:"uds",      frecMeses:3,    responsable:"",      proveedor:"Resistem"},
+];
+
+// ══════════════════════════════════════════════
+//  STATE & JSONBIN
+// ══════════════════════════════════════════════
+const BIN_URL = 'https://api.jsonbin.io/v3/b/';
+let state = { compras: [] };
+let _binId = localStorage.getItem('wf_ins_binid') || '69cd868236566621a86e7c09';
+let _apiKey = localStorage.getItem('wf_ins_apikey') || '$2a$10$8p4t41BnTv.9Ls.4kFLhouDMqJGQEd5LQlBYEz8n1y6nH/3dFq27G';
+
+function getHeaders(write=false) {
+  const h = {'Content-Type':'application/json'};
+  if (_apiKey) { h['X-Master-Key'] = _apiKey; h['X-Access-Key'] = _apiKey; }
+  if (write) h['X-Bin-Versioning'] = 'false';
+  return h;
+}
+
+async function loadData() {
+  if (!_binId) { hideLoading(); return; }
+  try {
+    const r = await fetch(BIN_URL + _binId + '/latest', {headers: getHeaders()});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const d = j.record || j;
+    if (d.compras) state.compras = d.compras;
+  } catch(e) {
+    toast('Error cargando datos: ' + e.message, 'err');
+  }
+  hideLoading();
+}
+
+async function saveData() {
+  if (!_binId) { toast('Configurá el Bin ID en ⚙️ primero', 'err'); return false; }
+  try {
+    const r = await fetch(BIN_URL + _binId, {
+      method: 'PUT', headers: getHeaders(true),
+      body: JSON.stringify(state)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return true;
+  } catch(e) {
+    toast('Error guardando: ' + e.message, 'err');
+    return false;
+  }
+}
+
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  renderAll();
+}
+
+// ══════════════════════════════════════════════
+//  LÓGICA DE ESTADO
+// ══════════════════════════════════════════════
+function getUltimaCompra(nombre) {
+  const cs = state.compras.filter(c => c.insumo === nombre);
+  if (!cs.length) return null;
+  return cs.reduce((a,b) => (a.fecha > b.fecha ? a : b)).fecha;
+}
+
+function calcEstado(insumo) {
+  const uc = getUltimaCompra(insumo.nombre);
+  if (!uc) return {tipo:'sin', label:'Sin datos', uc:null, prox:null};
+  const ucDate = new Date(uc);
+  const proxDate = new Date(ucDate);
+  proxDate.setDate(proxDate.getDate() + Math.round(insumo.frecMeses * 30.44));
+  const hoy = new Date();
+  const diffDias = Math.round((proxDate - hoy) / 86400000);
+  let tipo, label;
+  if (diffDias <= 0) { tipo='comprar'; label='🔴 COMPRAR'; }
+  else if (diffDias <= 15) { tipo='pronto'; label='🟡 ' + diffDias + 'd'; }
+  else { tipo='ok'; label='🟢 OK'; }
+  return {tipo, label, uc, prox: proxDate.toISOString().slice(0,10), diffDias};
+}
+
+function fmtFrec(m) {
+  if (m < 1) return Math.round(m*30) + ' días';
+  if (m === 1) return '1 mes';
+  if (m < 12) return m + ' meses';
+  return m/12 === 1 ? '1 año' : (m/12) + ' años';
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,mo,da] = d.split('-');
+  return da+'/'+mo+'/'+y;
+}
+
+function sectorClass(s) {
+  const m = {Termoformado:'tf',Planta:'pl',Extrusion:'ex',Rebobinado:'rb',Mantenimiento:'mt',Confeccion:'cf'};
+  return 'tag-' + (m[s]||'pl');
+}
+
+// ══════════════════════════════════════════════
+//  RENDER ALL
+// ══════════════════════════════════════════════
+let _alertSector = '';
+let _insSector = '';
+let _soloAlertas = false;
+
+function renderAll() {
+  renderAlertas();
+  renderInsumos();
+  renderHistorial();
+  populateSelect();
+}
+
+// ── ALERTAS ──────────────────────────────────
+function renderAlertas() {
+  const hoy = new Date();
+  const mesAnio = hoy.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  document.getElementById('alertas-sub').textContent = 'Actualizado: ' + hoy.toLocaleDateString('es-AR');
+
+  const urgentes = [], prontos = [];
+  INSUMOS_BASE.forEach(ins => {
+    const e = calcEstado(ins);
+    if (e.tipo === 'comprar') urgentes.push({ins, e});
+    else if (e.tipo === 'pronto') prontos.push({ins, e});
+  });
+
+  const badgeN = urgentes.length + prontos.length;
+  document.getElementById('badge-alertas').textContent = badgeN;
+
+  // stats
+  document.getElementById('alertas-stats').innerHTML = `
+    <div class="stat red"><div class="stat-n">${urgentes.length}</div><div class="stat-l">🔴 A comprar ya</div></div>
+    <div class="stat amber"><div class="stat-n">${prontos.length}</div><div class="stat-l">🟡 Próximos 15 días</div></div>
+    <div class="stat green"><div class="stat-n">${INSUMOS_BASE.length - urgentes.length - prontos.length}</div><div class="stat-l">🟢 OK / Sin datos</div></div>
+  `;
+
+  const all = [...urgentes, ...prontos];
+  const filtered = _alertSector ? all.filter(x => x.ins.sector === _alertSector) : all;
+  const grid = document.getElementById('alertas-grid');
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">✅</div>No hay alertas' + (_alertSector ? ' en ' + _alertSector : '') + '</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(({ins, e}) => `
+    <div class="acard ${e.tipo==='pronto'?'pronto':''}">
+      <div class="acard-name">${ins.nombre}</div>
+      <div class="acard-row">
+        <span class="tag ${sectorClass(ins.sector)}">${ins.sector}</span>
+        <span class="pill ${e.tipo==='comprar'?'pill-comprar':'pill-pronto'}">${e.label}</span>
+      </div>
+      <div class="acard-row">
+        <span class="tag">📦 Frec: ${fmtFrec(ins.frecMeses)}</span>
+        ${e.prox ? `<span class="tag">📅 Prox: ${fmtDate(e.prox)}</span>` : ''}
+      </div>
+      <div class="acard-meta">
+        <div class="acard-prov">${ins.proveedor||'—'}</div>
+        <div class="acard-resp">${ins.responsable||'—'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterAlertSector(btn, sector) {
+  document.querySelectorAll('#pg-alertas .filt-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  _alertSector = sector;
+  renderAlertas();
+}
+
+// ── INSUMOS ──────────────────────────────────
+function renderInsumos() {
+  const q = (document.getElementById('ins-search').value||'').toLowerCase();
+  let list = INSUMOS_BASE;
+  if (_insSector) list = list.filter(i => i.sector === _insSector);
+  if (q) list = list.filter(i => i.nombre.toLowerCase().includes(q) || i.proveedor.toLowerCase().includes(q));
+  if (_soloAlertas) list = list.filter(i => { const e = calcEstado(i); return e.tipo==='comprar'||e.tipo==='pronto'; });
+
+  document.getElementById('insumos-sub').textContent = list.length + ' insumos' + (_insSector?' · '+_insSector:'');
+
+  const tbody = document.getElementById('ins-tbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Sin resultados</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(ins => {
+    const e = calcEstado(ins);
+    const pillCls = {comprar:'pill-comprar',ok:'pill-ok',pronto:'pill-pronto',sin:'pill-sin'}[e.tipo];
+    return `<tr>
+      <td class="td-name">${ins.nombre}</td>
+      <td><span class="tag ${sectorClass(ins.sector)}">${ins.sector}</span></td>
+      <td class="td-freq">${ins.unidad}</td>
+      <td class="td-freq">${fmtFrec(ins.frecMeses)}</td>
+      <td class="td-date">${fmtDate(e.uc)}</td>
+      <td class="td-date">${fmtDate(e.prox)}</td>
+      <td><span class="pill ${pillCls}">${e.label}</span></td>
+      <td class="td-date">${ins.responsable||'—'}</td>
+      <td class="td-date">${ins.proveedor||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterInsSector(btn, sector) {
+  document.querySelectorAll('#pg-insumos .filt-btn:not(#filt-solo-alertas)').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  _insSector = sector;
+  renderInsumos();
+}
+
+function toggleSoloAlertas(btn) {
+  _soloAlertas = !_soloAlertas;
+  btn.classList.toggle('on', _soloAlertas);
+  renderInsumos();
+}
+
+// ── SELECT INSUMOS ─────────────────────────────
+function populateSelect() {
+  const sel = document.getElementById('f-insumo');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Seleccionar insumo —</option>';
+  // Agrupar por sector
+  const sectores = [...new Set(INSUMOS_BASE.map(i=>i.sector))];
+  sectores.forEach(s => {
+    const og = document.createElement('optgroup');
+    og.label = s;
+    INSUMOS_BASE.filter(i=>i.sector===s).forEach(ins => {
+      const o = document.createElement('option');
+      o.value = ins.id;
+      o.textContent = ins.nombre;
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+  if (cur) sel.value = cur;
+}
+
+function onInsumoChange() {
+  const id = parseInt(document.getElementById('f-insumo').value);
+  const ins = INSUMOS_BASE.find(i => i.id === id);
+  if (ins) {
+    document.getElementById('f-unidad').value = ins.unidad;
+    document.getElementById('f-proveedor').value = ins.proveedor || '';
+    document.getElementById('f-prov-hint').textContent = ins.proveedor ? '↑ Proveedor habitual' : '';
+  } else {
+    document.getElementById('f-unidad').value = '';
+    document.getElementById('f-proveedor').value = '';
+    document.getElementById('f-prov-hint').textContent = '';
+  }
+}
+
+// ── GUARDAR COMPRA ─────────────────────────────
+async function guardarCompra() {
+  const fecha = document.getElementById('f-fecha').value;
+  const insumoId = parseInt(document.getElementById('f-insumo').value);
+  const cantidad = document.getElementById('f-cantidad').value;
+  const proveedor = document.getElementById('f-proveedor').value.trim();
+  const obs = document.getElementById('f-obs').value.trim();
+
+  if (!fecha) { toast('Ingresá la fecha', 'err'); return; }
+  if (!insumoId) { toast('Seleccioná un insumo', 'err'); return; }
+
+  const ins = INSUMOS_BASE.find(i => i.id === insumoId);
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  state.compras.push({
+    id: Date.now(),
+    fecha,
+    insumo: ins.nombre,
+    unidad: ins.unidad,
+    cantidad: cantidad || '',
+    proveedor,
+    obs
+  });
+
+  const ok = await saveData();
+  btn.disabled = false;
+  btn.textContent = '✓ Guardar compra';
+
+  if (ok) {
+    toast('✓ Compra registrada: ' + ins.nombre, 'ok');
+    resetForm();
+    renderAll();
+    goTo('alertas');
+  }
+}
+
+function resetForm() {
+  document.getElementById('f-fecha').value = '';
+  document.getElementById('f-insumo').value = '';
+  document.getElementById('f-unidad').value = '';
+  document.getElementById('f-cantidad').value = '';
+  document.getElementById('f-proveedor').value = '';
+  document.getElementById('f-prov-hint').textContent = '';
+  document.getElementById('f-obs').value = '';
+}
+
+// ── HISTORIAL ──────────────────────────────────
+function renderHistorial() {
+  const q = (document.getElementById('hist-search').value||'').toLowerCase();
+  let list = [...state.compras].sort((a,b) => b.fecha.localeCompare(a.fecha));
+  if (q) list = list.filter(c => c.insumo.toLowerCase().includes(q) || (c.proveedor||'').toLowerCase().includes(q));
+  document.getElementById('hist-sub').textContent = list.length + ' registros';
+
+  const tbody = document.getElementById('hist-tbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">📋</div>Sin compras registradas todavía</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(c => `
+    <tr>
+      <td class="td-date">${fmtDate(c.fecha)}</td>
+      <td class="td-name">${c.insumo}</td>
+      <td class="td-freq">${c.cantidad ? c.cantidad+' '+c.unidad : '—'}</td>
+      <td class="td-date">${c.proveedor||'—'}</td>
+      <td style="max-width:200px;font-size:12px;color:var(--dim)">${c.obs||''}</td>
+      <td><button class="del-btn" onclick="borrarCompra(${c.id})" title="Eliminar">🗑</button></td>
+    </tr>
+  `).join('');
+}
+
+async function borrarCompra(id) {
+  if (!confirm('¿Eliminar este registro de compra?')) return;
+  state.compras = state.compras.filter(c => c.id !== id);
+  const ok = await saveData();
+  if (ok) { toast('Registro eliminado', 'ok'); renderAll(); }
+}
+
+// ── CONFIG ─────────────────────────────────────
+function saveBinId() {
+  const v = document.getElementById('cfg-binid').value.trim();
+  if (!v) return;
+  _binId = v;
+  localStorage.setItem('wf_ins_binid', v);
+  toast('Bin ID guardado. Recargando…', 'ok');
+  setTimeout(() => location.reload(), 1000);
+}
+function saveApiKey() {
+  _apiKey = document.getElementById('cfg-apikey').value.trim();
+  localStorage.setItem('wf_ins_apikey', _apiKey);
+  toast('API Key guardada', 'ok');
+}
+async function testConnection() {
+  const s = document.getElementById('bin-status');
+  s.textContent = 'Probando…'; s.className = 'bin-status';
+  try {
+    const r = await fetch(BIN_URL + _binId + '/latest', {headers: getHeaders()});
+    if (r.ok) { s.textContent = '✓ Conectado'; s.className = 'bin-status bin-ok'; }
+    else { s.textContent = '✗ Error HTTP ' + r.status; s.className = 'bin-status bin-err'; }
+  } catch(e) {
+    s.textContent = '✗ ' + e.message; s.className = 'bin-status bin-err';
+  }
+}
+async function forceSync() {
+  await loadData();
+  renderAll();
+  toast('Sincronizado', 'ok');
+}
+
+// ── NAVIGATION ─────────────────────────────────
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById('pg-'+page).classList.add('on');
+  document.querySelector(`.nb[onclick="goTo('${page}')"]`).classList.add('on');
+  if (page === 'compra') {
+    const hoy = new Date(); const off = hoy.getTimezoneOffset()*60000;
+    document.getElementById('f-fecha').value = new Date(hoy-off).toISOString().slice(0,10);
+  }
+  if (page === 'config') {
+    document.getElementById('cfg-binid').value = _binId;
+    document.getElementById('cfg-apikey').value = _apiKey;
+  }
+}
+
+// ── TOAST ──────────────────────────────────────
+let _toastT;
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.className = '', 3000);
+}
+
+// ── INIT ───────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>

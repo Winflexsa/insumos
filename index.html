@@ -280,6 +280,68 @@ label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bot
 .sector-dot{
   display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;
 }
+
+/* ─── MODAL DETALLE ─────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;
+  display:flex;align-items:flex-start;justify-content:flex-end;
+  padding:0;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-panel{
+  width:min(520px,100vw);height:100vh;overflow-y:auto;
+  background:var(--bg2);border-left:1px solid var(--line);
+  box-shadow:-4px 0 24px rgba(0,0,0,.1);
+  transform:translateX(40px);transition:transform .2s;
+  display:flex;flex-direction:column;
+}
+.modal-overlay.open .modal-panel{transform:none;}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:var(--bg2);z-index:1;
+}
+.modal-title{font-size:15px;font-weight:800;flex:1;padding-right:10px;}
+.modal-close{
+  background:none;border:none;font-size:20px;cursor:pointer;
+  color:var(--muted);padding:2px 6px;border-radius:4px;
+  transition:all .15s;line-height:1;
+}
+.modal-close:hover{background:var(--bg3);color:var(--text);}
+.modal-body{padding:20px;flex:1;}
+.modal-section{margin-bottom:20px;}
+.modal-section-title{
+  font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:10px;padding-bottom:6px;
+  border-bottom:1px solid var(--line);
+}
+.detail-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.detail-item label{
+  display:block;font-size:10px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;
+}
+.detail-item span{font-size:13px;font-weight:600;}
+.hist-mini{display:flex;flex-direction:column;gap:6px;}
+.hist-mini-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;background:var(--bg3);border-radius:var(--r-sm);
+  border:1px solid var(--line);font-size:12px;
+}
+.hist-mini-date{font-family:var(--mono);color:var(--dim);font-size:11px;min-width:70px;}
+.hist-mini-qty{font-family:var(--mono);color:var(--accent);font-weight:700;}
+.hist-mini-prov{color:var(--muted);font-size:11px;flex:1;}
+.hist-mini-empty{color:var(--muted);font-size:12px;text-align:center;padding:12px 0;}
+.quick-compra{
+  background:var(--bg3);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px;
+}
+/* hacer filas de tabla clickeables */
+tbody tr.clickable{cursor:pointer;}
+tbody tr.clickable:hover{background:var(--bg3);}
+
 </style>
 </head>
 <body>
@@ -765,7 +827,7 @@ function renderInsumos() {
   tbody.innerHTML = list.map(ins => {
     const e = calcEstado(ins);
     const pillCls = {comprar:'pill-comprar',ok:'pill-ok',pronto:'pill-pronto',sin:'pill-sin'}[e.tipo];
-    return `<tr>
+    return `<tr class="clickable" onclick="openDetalle(${ins.id})">
       <td class="td-name">${ins.nombre}</td>
       <td><span class="tag ${sectorClass(ins.sector)}">${ins.sector}</span></td>
       <td class="td-freq">${ins.unidad}</td>
@@ -965,6 +1027,182 @@ function toast(msg, type='ok') {
 
 // ── INIT ───────────────────────────────────────
 loadData();
+
+// ─── MODAL DETALLE ────────────────────────────────────────────
+let _modalInsId = null;
+
+function openDetalle(id) {
+  _modalInsId = id;
+  const ins = INSUMOS_BASE.find(i => i.id === id);
+  if (!ins) return;
+
+  // Título
+  document.getElementById('modal-nombre').textContent = ins.nombre;
+
+  // Info grid
+  const e = calcEstado(ins);
+  const pillMap = {comprar:'pill-comprar',ok:'pill-ok',pronto:'pill-pronto',sin:'pill-sin'};
+  document.getElementById('modal-info').innerHTML = `
+    <div class="detail-item">
+      <label>Sector</label>
+      <span><span class="tag ${sectorClass(ins.sector)}">${ins.sector}</span></span>
+    </div>
+    <div class="detail-item">
+      <label>Estado</label>
+      <span><span class="pill ${pillMap[e.tipo]}">${e.label}</span></span>
+    </div>
+    <div class="detail-item">
+      <label>Unidad</label>
+      <span>${ins.unidad}</span>
+    </div>
+    <div class="detail-item">
+      <label>Frecuencia</label>
+      <span>${fmtFrec(ins.frecMeses)}</span>
+    </div>
+    <div class="detail-item">
+      <label>Última compra</label>
+      <span>${fmtDate(e.uc) || '—'}</span>
+    </div>
+    <div class="detail-item">
+      <label>Próxima compra</label>
+      <span>${fmtDate(e.prox) || '—'}</span>
+    </div>
+    <div class="detail-item">
+      <label>Responsable</label>
+      <span>${ins.responsable || '—'}</span>
+    </div>
+    <div class="detail-item">
+      <label>Proveedor habitual</label>
+      <span>${ins.proveedor || '—'}</span>
+    </div>
+  `;
+
+  // Historial filtrado
+  const hist = [...state.compras]
+    .filter(c => c.insumo === ins.nombre)
+    .sort((a,b) => b.fecha.localeCompare(a.fecha))
+    .slice(0, 8);
+  const histEl = document.getElementById('modal-historial');
+  if (!hist.length) {
+    histEl.innerHTML = '<div class="hist-mini-empty">Sin compras registradas todavía</div>';
+  } else {
+    histEl.innerHTML = hist.map(c => `
+      <div class="hist-mini-row">
+        <span class="hist-mini-date">${fmtDate(c.fecha)}</span>
+        <span class="hist-mini-qty">${c.cantidad ? c.cantidad+' '+c.unidad : '—'}</span>
+        <span class="hist-mini-prov">${c.proveedor || ''}</span>
+        <span style="font-size:11px;color:var(--dim)">${c.obs||''}</span>
+      </div>
+    `).join('');
+  }
+
+  // Prellenar form rápido
+  const hoy = new Date(); const off = hoy.getTimezoneOffset()*60000;
+  document.getElementById('md-fecha').value = new Date(hoy-off).toISOString().slice(0,10);
+  document.getElementById('md-cantidad').value = '';
+  document.getElementById('md-proveedor').value = ins.proveedor || '';
+  document.getElementById('md-obs').value = '';
+
+  // Abrir
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function guardarCompraModal() {
+  const ins = INSUMOS_BASE.find(i => i.id === _modalInsId);
+  if (!ins) return;
+  const fecha = document.getElementById('md-fecha').value;
+  const cantidad = document.getElementById('md-cantidad').value;
+  const proveedor = document.getElementById('md-proveedor').value.trim();
+  const obs = document.getElementById('md-obs').value.trim();
+  if (!fecha) { toast('Ingresá la fecha', 'err'); return; }
+
+  const btn = document.getElementById('md-btn-guardar');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+
+  state.compras.push({
+    id: Date.now(), fecha,
+    insumo: ins.nombre, unidad: ins.unidad,
+    cantidad: cantidad || '', proveedor, obs
+  });
+
+  const ok = await saveData();
+  btn.disabled = false; btn.textContent = '✓ Guardar compra';
+
+  if (ok) {
+    toast('✓ Compra registrada: ' + ins.nombre, 'ok');
+    renderAll();
+    // Actualizar historial en el modal
+    openDetalle(_modalInsId);
+  }
+}
+
+// Cerrar con Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
 </script>
+
+<!-- ─── MODAL DETALLE INSUMO ─────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-panel" id="modal-panel">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-nombre">—</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-section-title">📦 Información del insumo</div>
+        <div class="detail-grid" id="modal-info"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">📋 Últimas compras</div>
+        <div class="hist-mini" id="modal-historial"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">🛒 Registrar compra rápida</div>
+        <div class="quick-compra">
+          <div class="form-row col2" style="margin-bottom:10px">
+            <div>
+              <label>Fecha</label>
+              <input class="finput" type="date" id="md-fecha">
+            </div>
+            <div>
+              <label>Cantidad</label>
+              <input class="finput" type="number" id="md-cantidad" min="0" step="any" placeholder="0">
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:10px">
+            <div>
+              <label>Proveedor</label>
+              <input class="finput" type="text" id="md-proveedor" placeholder="Proveedor">
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:12px">
+            <div>
+              <label>Observación <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+              <input class="finput" type="text" id="md-obs" placeholder="N° factura, precio…">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="md-btn-guardar" onclick="guardarCompraModal()" style="width:100%">
+            ✓ Guardar compra
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

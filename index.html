@@ -282,6 +282,35 @@ label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bot
 }
 
 /* ─── MODAL DETALLE ─────────────────────────────────────────── */
+
+/* ─── EDICIÓN EN MODAL ──────────────────────────────────────── */
+.modal-edit-bar{
+  display:flex;gap:8px;margin-bottom:16px;
+}
+.btn-edit-mode{
+  padding:6px 14px;border-radius:var(--r-sm);border:1px solid var(--line);
+  background:var(--bg3);color:var(--dim);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .15s;
+}
+.btn-edit-mode:hover{border-color:var(--muted);color:var(--text);}
+.btn-edit-mode.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.edit-fields{display:none;}
+.edit-fields.open{display:block;}
+.edit-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.edit-field label{
+  display:block;font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;
+}
+.edit-field .finput,.edit-field .fselect{font-size:13px;}
+.save-edit-row{display:flex;gap:8px;margin-top:12px;}
+.overrides-badge{
+  display:inline-block;font-size:10px;font-family:var(--mono);
+  background:var(--blue-bg);color:#87b4f0;border:1px solid var(--blue-border);
+  padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;
+}
+
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;
   display:flex;align-items:flex-start;justify-content:flex-end;
@@ -649,7 +678,7 @@ const INSUMOS_BASE = [
 //  STATE & JSONBIN
 // ══════════════════════════════════════════════
 const BIN_URL = 'https://api.jsonbin.io/v3/b/';
-let state = { compras: [] };
+let state = { compras: [], overrides: {} };
 let _binId = localStorage.getItem('wf_ins_binid') || '69cd868236566621a86e7c09';
 let _apiKey = localStorage.getItem('wf_ins_apikey') || '$2a$10$8p4t41BnTv.9Ls.4kFLhouDMqJGQEd5LQlBYEz8n1y6nH/3dFq27G';
 
@@ -668,6 +697,7 @@ async function loadData() {
     const j = await r.json();
     const d = j.record || j;
     if (d.compras) state.compras = d.compras;
+    if (d.overrides) state.overrides = d.overrides;
   } catch(e) {
     toast('Error cargando datos: ' + e.message, 'err');
   }
@@ -698,6 +728,18 @@ function hideLoading() {
 // ══════════════════════════════════════════════
 //  LÓGICA DE ESTADO
 // ══════════════════════════════════════════════
+
+// Resolver insumo con overrides aplicados
+function getIns(id) {
+  const base = getIns(id);
+  if (!base) return null;
+  const ov = state.overrides[id] || {};
+  return { ...base, ...ov };
+}
+function getAllIns() {
+  return INSUMOS_BASE.map(i => getIns(i.id));
+}
+
 function getUltimaCompra(nombre) {
   const cs = state.compras.filter(c => c.insumo === nombre);
   if (!cs.length) return null;
@@ -758,7 +800,7 @@ function renderAlertas() {
   document.getElementById('alertas-sub').textContent = 'Actualizado: ' + hoy.toLocaleDateString('es-AR');
 
   const urgentes = [], prontos = [];
-  INSUMOS_BASE.forEach(ins => {
+  getAllIns().forEach(ins => {
     const e = calcEstado(ins);
     if (e.tipo === 'comprar') urgentes.push({ins, e});
     else if (e.tipo === 'pronto') prontos.push({ins, e});
@@ -771,7 +813,7 @@ function renderAlertas() {
   document.getElementById('alertas-stats').innerHTML = `
     <div class="stat red"><div class="stat-n">${urgentes.length}</div><div class="stat-l">🔴 A comprar ya</div></div>
     <div class="stat amber"><div class="stat-n">${prontos.length}</div><div class="stat-l">🟡 Próximos 15 días</div></div>
-    <div class="stat green"><div class="stat-n">${INSUMOS_BASE.length - urgentes.length - prontos.length}</div><div class="stat-l">🟢 OK / Sin datos</div></div>
+    <div class="stat green"><div class="stat-n">${getAllIns().length - urgentes.length - prontos.length}</div><div class="stat-l">🟢 OK / Sin datos</div></div>
   `;
 
   const all = [...urgentes, ...prontos];
@@ -812,7 +854,7 @@ function filterAlertSector(btn, sector) {
 // ── INSUMOS ───────────────────────────────────
 function renderInsumos() {
   const q = (document.getElementById('ins-search').value||'').toLowerCase();
-  let list = INSUMOS_BASE;
+  let list = getAllIns();
   if (_insSector) list = list.filter(i => i.sector === _insSector);
   if (q) list = list.filter(i => i.nombre.toLowerCase().includes(q) || i.proveedor.toLowerCase().includes(q));
   if (_soloAlertas) list = list.filter(i => { const e = calcEstado(i); return e.tipo==='comprar'||e.tipo==='pronto'; });
@@ -864,7 +906,7 @@ function populateSelect() {
   sectores.forEach(s => {
     const og = document.createElement('optgroup');
     og.label = s;
-    INSUMOS_BASE.filter(i=>i.sector===s).forEach(ins => {
+    getAllIns().filter(i=>i.sector===s).forEach(ins => {
       const o = document.createElement('option');
       o.value = ins.id;
       o.textContent = ins.nombre;
@@ -877,7 +919,7 @@ function populateSelect() {
 
 function onInsumoChange() {
   const id = parseInt(document.getElementById('f-insumo').value);
-  const ins = INSUMOS_BASE.find(i => i.id === id);
+  const ins = getIns(id);
   if (ins) {
     document.getElementById('f-unidad').value = ins.unidad;
     document.getElementById('f-proveedor').value = ins.proveedor || '';
@@ -1028,12 +1070,84 @@ function toast(msg, type='ok') {
 // ── INIT ───────────────────────────────────────
 loadData();
 
+
+// ─── EDICIÓN DE INSUMOS ───────────────────────────────────────
+let _editMode = false;
+
+function toggleEditMode() {
+  _editMode = !_editMode;
+  const panel = document.getElementById('edit-fields-panel');
+  const btn = document.getElementById('btn-toggle-edit');
+  panel.classList.toggle('open', _editMode);
+  btn.classList.toggle('active', _editMode);
+  btn.textContent = _editMode ? '✕ Cancelar edición' : '✏️ Editar datos';
+  if (_editMode) fillEditFields(_modalInsId);
+}
+
+function fillEditFields(id) {
+  const ins = getIns(id);
+  if (!ins) return;
+  document.getElementById('ed-frec').value = ins.frecMeses;
+  document.getElementById('ed-unidad').value = ins.unidad;
+  document.getElementById('ed-responsable').value = ins.responsable || '';
+  document.getElementById('ed-proveedor').value = ins.proveedor || '';
+  document.getElementById('ed-nombre').value = ins.nombre;
+  // badge modificado
+  const hasOv = !!state.overrides[id];
+  document.getElementById('edit-modified-badge').style.display = hasOv ? '' : 'none';
+}
+
+async function guardarEdicion() {
+  const id = _modalInsId;
+  const frecVal = parseFloat(document.getElementById('ed-frec').value);
+  if (!frecVal || frecVal <= 0) { toast('Frecuencia inválida', 'err'); return; }
+
+  state.overrides[id] = {
+    frecMeses: frecVal,
+    unidad: document.getElementById('ed-unidad').value.trim() || getIns(id).unidad,
+    responsable: document.getElementById('ed-responsable').value.trim(),
+    proveedor: document.getElementById('ed-proveedor').value.trim(),
+    nombre: document.getElementById('ed-nombre').value.trim() || getIns(id).nombre,
+  };
+
+  const ok = await saveData();
+  if (ok) {
+    toast('✓ Insumo actualizado', 'ok');
+    renderAll();
+    // cerrar modo edición y reabrir con datos frescos
+    _editMode = false;
+    const panel = document.getElementById('edit-fields-panel');
+    const btn = document.getElementById('btn-toggle-edit');
+    panel.classList.remove('open');
+    btn.classList.remove('active');
+    btn.textContent = '✏️ Editar datos';
+    openDetalle(id);
+  }
+}
+
+async function resetEdicion() {
+  if (!confirm('¿Restablecer este insumo a sus valores originales?')) return;
+  delete state.overrides[_modalInsId];
+  const ok = await saveData();
+  if (ok) {
+    toast('Insumo restablecido', 'ok');
+    renderAll();
+    _editMode = false;
+    const panel = document.getElementById('edit-fields-panel');
+    const btn = document.getElementById('btn-toggle-edit');
+    panel.classList.remove('open');
+    btn.classList.remove('active');
+    btn.textContent = '✏️ Editar datos';
+    openDetalle(_modalInsId);
+  }
+}
+
 // ─── MODAL DETALLE ────────────────────────────────────────────
 let _modalInsId = null;
 
 function openDetalle(id) {
   _modalInsId = id;
-  const ins = INSUMOS_BASE.find(i => i.id === id);
+  const ins = getIns(id);
   if (!ins) return;
 
   // Título
@@ -1103,6 +1217,13 @@ function openDetalle(id) {
   document.getElementById('md-proveedor').value = ins.proveedor || '';
   document.getElementById('md-obs').value = '';
 
+  // Reset edit mode
+  _editMode = false;
+  const _ep = document.getElementById('edit-fields-panel');
+  const _eb = document.getElementById('btn-toggle-edit');
+  if (_ep) { _ep.classList.remove('open'); }
+  if (_eb) { _eb.classList.remove('active'); _eb.textContent = '✏️ Editar datos'; }
+
   // Abrir
   document.getElementById('modal-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1167,6 +1288,45 @@ document.addEventListener('keydown', e => {
       <div class="modal-section">
         <div class="modal-section-title">📋 Últimas compras</div>
         <div class="hist-mini" id="modal-historial"></div>
+      </div>
+
+
+      <div class="modal-section" id="modal-edit-section">
+        <div class="modal-section-title">
+          ✏️ Editar insumo
+          <span class="overrides-badge" id="edit-modified-badge" style="display:none">modificado</span>
+        </div>
+        <div class="modal-edit-bar">
+          <button class="btn-edit-mode" id="btn-toggle-edit" onclick="toggleEditMode()">✏️ Editar datos</button>
+        </div>
+        <div class="edit-fields" id="edit-fields-panel">
+          <div class="edit-grid">
+            <div class="edit-field">
+              <label>Frecuencia (meses)</label>
+              <input class="finput" type="number" id="ed-frec" min="0.5" step="0.5" placeholder="ej: 3">
+            </div>
+            <div class="edit-field">
+              <label>Unidad</label>
+              <input class="finput" type="text" id="ed-unidad" placeholder="ej: kgs, uds, lts">
+            </div>
+            <div class="edit-field">
+              <label>Responsable</label>
+              <input class="finput" type="text" id="ed-responsable" placeholder="ej: JS">
+            </div>
+            <div class="edit-field">
+              <label>Proveedor habitual</label>
+              <input class="finput" type="text" id="ed-proveedor" placeholder="ej: Zida">
+            </div>
+          </div>
+          <div class="edit-field" style="margin-top:10px">
+            <label>Nombre del insumo</label>
+            <input class="finput" type="text" id="ed-nombre" placeholder="Nombre completo">
+          </div>
+          <div class="save-edit-row">
+            <button class="btn btn-primary" onclick="guardarEdicion()" style="flex:1">💾 Guardar cambios</button>
+            <button class="btn btn-ghost" onclick="resetEdicion()">Restablecer</button>
+          </div>
+        </div>
       </div>
 
       <div class="modal-section">

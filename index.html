@@ -731,7 +731,7 @@ function hideLoading() {
 
 // Resolver insumo con overrides aplicados
 function getIns(id) {
-  const base = getIns(id);
+  const base = INSUMOS_BASE.find(i => i.id === id);
   if (!base) return null;
   const ov = state.overrides[id] || {};
   return { ...base, ...ov };
@@ -902,7 +902,7 @@ function populateSelect() {
   const cur = sel.value;
   sel.innerHTML = '<option value="">— Seleccionar insumo —</option>';
   // Agrupar por sector
-  const sectores = [...new Set(INSUMOS_BASE.map(i=>i.sector))];
+  const sectores = [...new Set(getAllIns().map(i=>i.sector))];
   sectores.forEach(s => {
     const og = document.createElement('optgroup');
     og.label = s;
@@ -942,7 +942,7 @@ async function guardarCompra() {
   if (!fecha) { toast('Ingresá la fecha', 'err'); return; }
   if (!insumoId) { toast('Seleccioná un insumo', 'err'); return; }
 
-  const ins = INSUMOS_BASE.find(i => i.id === insumoId);
+  const ins = getAllIns().find(i => i.id === insumoId);
   const btn = document.getElementById('btn-guardar');
   btn.disabled = true;
   btn.textContent = 'Guardando…';
@@ -1236,7 +1236,7 @@ function closeModal(e) {
 }
 
 async function guardarCompraModal() {
-  const ins = INSUMOS_BASE.find(i => i.id === _modalInsId);
+  const ins = getAllIns().find(i => i.id === _modalInsId);
   if (!ins) return;
   const fecha = document.getElementById('md-fecha').value;
   const cantidad = document.getElementById('md-cantidad').value;

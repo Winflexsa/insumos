@@ -506,6 +506,7 @@ tbody tr.clickable:hover{background:var(--bg3);}
           <div class="ptitle">📦 Catálogo de insumos</div>
           <div class="psub" id="insumos-sub">—</div>
         </div>
+        <button class="btn-nuevo-ins" onclick="openNuevoInsumo()">＋ Nuevo insumo</button>
       </div>
       <div class="filters">
         <div class="search-wrap"><input id="ins-search" type="text" placeholder="Buscar insumo…" oninput="renderInsumos()"></div>
@@ -793,7 +794,7 @@ const INSUMOS_BASE = [
 //  STATE & JSONBIN
 // ══════════════════════════════════════════════
 const BIN_URL = 'https://api.jsonbin.io/v3/b/';
-let state = { compras: [], overrides: {} };
+let state = { compras: [], overrides: {}, customInsumos: [], deletedIds: [] };
 let _binId = localStorage.getItem('wf_ins_binid') || '69cd868236566621a86e7c09';
 let _apiKey = localStorage.getItem('wf_ins_apikey') || '$2a$10$8p4t41BnTv.9Ls.4kFLhouDMqJGQEd5LQlBYEz8n1y6nH/3dFq27G';
 
@@ -813,6 +814,8 @@ async function loadData() {
     const d = j.record || j;
     if (d.compras) state.compras = d.compras;
     if (d.overrides) state.overrides = d.overrides;
+    if (d.customInsumos) state.customInsumos = d.customInsumos;
+    if (d.deletedIds) state.deletedIds = d.deletedIds;
   } catch(e) {
     toast('Error cargando datos: ' + e.message, 'err');
   }
@@ -854,7 +857,14 @@ function getIns(id) {
   return { ...base, ...ov };
 }
 function getAllIns() {
-  return INSUMOS_BASE.map(i => getIns(i.id));
+  const base = INSUMOS_BASE
+    .filter(i => !state.deletedIds.includes(i.id))
+    .map(i => getIns(i.id));
+  const custom = state.customInsumos.map(i => {
+    const ov = state.overrides[i.id] || {};
+    return { ...i, ...ov };
+  });
+  return [...base, ...custom];
 }
 
 function getUltimaCompra(nombre) {
@@ -987,7 +997,7 @@ function renderInsumos() {
     const e = calcEstado(ins);
     const pillCls = {comprar:'pill-comprar',ok:'pill-ok',pronto:'pill-pronto',sin:'pill-sin'}[e.tipo];
     return `<tr class="clickable" onclick="openDetalle(${ins.id})">
-      <td class="td-name">${ins.nombre}</td>
+      <td class="td-name">${ins.nombre}${ins._custom ? '<span class="custom-tag">nuevo</span>' : ''}</td>
       <td><span class="tag ${sectorClass(ins.sector)}">${ins.sector}</span></td>
       <td class="td-freq">${ins.unidad}</td>
       <td class="td-freq">${fmtFrec(ins.frecMeses)}</td>
@@ -1387,6 +1397,88 @@ document.addEventListener('keydown', e => {
 });
 
 
+
+// ─── NUEVO INSUMO ─────────────────────────────────────────────
+function openNuevoInsumo() {
+  document.getElementById('ni-nombre').value = '';
+  document.getElementById('ni-sector').value = '';
+  document.getElementById('ni-unidad').value = '';
+  document.getElementById('ni-frec').value = '';
+  document.getElementById('ni-resp').value = '';
+  document.getElementById('ni-prov').value = '';
+  document.getElementById('modal-nuevo-overlay').classList.add('open');
+}
+function closeNuevoInsumo(e) {
+  if (e && e.target !== document.getElementById('modal-nuevo-overlay')) return;
+  document.getElementById('modal-nuevo-overlay').classList.remove('open');
+}
+async function guardarNuevoInsumo() {
+  const nombre = document.getElementById('ni-nombre').value.trim();
+  const sector = document.getElementById('ni-sector').value;
+  const unidad = document.getElementById('ni-unidad').value.trim();
+  const frec   = parseFloat(document.getElementById('ni-frec').value);
+  if (!nombre) { toast('Ingresá el nombre del insumo', 'err'); return; }
+  if (!sector) { toast('Seleccioná el sector', 'err'); return; }
+  if (!unidad) { toast('Ingresá la unidad', 'err'); return; }
+  if (!frec || frec <= 0) { toast('Ingresá una frecuencia válida', 'err'); return; }
+
+  const newId = Date.now(); // ID único basado en timestamp
+  state.customInsumos.push({
+    id: newId,
+    nombre,
+    sector,
+    unidad,
+    frecMeses: frec,
+    responsable: document.getElementById('ni-resp').value.trim(),
+    proveedor:   document.getElementById('ni-prov').value.trim(),
+    _custom: true
+  });
+
+  const ok = await saveData();
+  if (ok) {
+    toast('✓ Insumo "' + nombre + '" agregado', 'ok');
+    closeNuevoInsumo();
+    renderAll();
+    populateSelect();
+  }
+}
+
+// ─── ELIMINAR INSUMO ──────────────────────────────────────────
+async function eliminarInsumo(id) {
+  const ins = getAllIns().find(i => i.id === id);
+  if (!ins) return;
+  if (!confirm('¿Eliminar "' + ins.nombre + '" del catálogo? Esta acción no se puede deshacer fácilmente.')) return;
+
+  if (ins._custom) {
+    // Insumo creado por usuario: eliminarlo de customInsumos
+    state.customInsumos = state.customInsumos.filter(i => i.id !== id);
+  } else {
+    // Insumo base: marcarlo como eliminado
+    if (!state.deletedIds.includes(id)) state.deletedIds.push(id);
+  }
+  // Limpiar overrides si los había
+  delete state.overrides[id];
+
+  const ok = await saveData();
+  if (ok) {
+    toast('Insumo eliminado', 'ok');
+    // Si el modal de detalle está abierto con este insumo, cerrarlo
+    if (_modalInsId === id) {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    renderAll();
+    populateSelect();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeNuevoInsumo();
+    closeModal();
+  }
+});
+
 // ─── SINCRONIZACIÓN MANUAL ────────────────────────────────────
 async function syncManual() {
   const btn = document.getElementById('btn-sync');
@@ -1418,6 +1510,8 @@ async function loadDataSilent() {
     const d = j.record || j;
     if (d.compras) state.compras = d.compras;
     if (d.overrides) state.overrides = d.overrides;
+    if (d.customInsumos) state.customInsumos = d.customInsumos;
+    if (d.deletedIds) state.deletedIds = d.deletedIds;
   } catch(e) {
     toast('Error al sincronizar: ' + e.message, 'err');
   }
@@ -1480,6 +1574,9 @@ async function loadDataSilent() {
             <button class="btn btn-primary" onclick="guardarEdicion()" style="flex:1">💾 Guardar cambios</button>
             <button class="btn btn-ghost" onclick="resetEdicion()">Restablecer</button>
           </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
+            <button class="btn-eliminar-ins" onclick="eliminarInsumo(_modalInsId)">🗑 Eliminar este insumo</button>
+          </div>
         </div>
       </div>
 
@@ -1514,6 +1611,64 @@ async function loadDataSilent() {
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+
+<!-- ─── MODAL NUEVO INSUMO ─────────────────────────────────── -->
+<div id="modal-nuevo-overlay" onclick="closeNuevoInsumo(event)">
+  <div id="modal-nuevo-panel">
+    <div class="modal-nuevo-header">
+      <span>＋ Agregar nuevo insumo</span>
+      <button class="modal-close" onclick="closeNuevoInsumo()">✕</button>
+    </div>
+    <div class="modal-nuevo-body">
+      <div class="form-row">
+        <div>
+          <label>Nombre del insumo *</label>
+          <input class="finput" type="text" id="ni-nombre" placeholder="ej: Aceite hidráulico">
+        </div>
+      </div>
+      <div class="form-row col2">
+        <div>
+          <label>Sector *</label>
+          <select class="fselect" id="ni-sector">
+            <option value="">— Seleccionar —</option>
+            <option value="Termoformado">Termoformado</option>
+            <option value="Planta">Planta</option>
+            <option value="Extrusion">Extrusión</option>
+            <option value="Rebobinado">Rebobinado</option>
+            <option value="Mantenimiento">Mantenimiento</option>
+            <option value="Confeccion">Confección</option>
+          </select>
+        </div>
+        <div>
+          <label>Unidad *</label>
+          <input class="finput" type="text" id="ni-unidad" placeholder="ej: kgs, uds, lts">
+        </div>
+      </div>
+      <div class="form-row col2">
+        <div>
+          <label>Frecuencia (meses) *</label>
+          <input class="finput" type="number" id="ni-frec" min="0.5" step="0.5" placeholder="ej: 3">
+          <div class="form-hint">0.5=quincenal · 1=mensual · 3=trimestral · 6=semestral</div>
+        </div>
+        <div>
+          <label>Responsable</label>
+          <input class="finput" type="text" id="ni-resp" placeholder="ej: JS, JD/JS">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Proveedor habitual</label>
+          <input class="finput" type="text" id="ni-prov" placeholder="ej: Bulonera Esteban">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary" onclick="guardarNuevoInsumo()" style="flex:1">✓ Agregar insumo</button>
+        <button class="btn btn-ghost" onclick="closeNuevoInsumo()">Cancelar</button>
+      </div>
     </div>
   </div>
 </div>

@@ -416,6 +416,47 @@ tbody tr.clickable:hover{background:var(--bg3);}
 }
 .login-shake{animation:shake .4s;}
 
+
+/* ─── NUEVO INSUMO / ELIMINAR ───────────────────────────────── */
+.btn-nuevo-ins{
+  padding:8px 16px;border-radius:var(--r-sm);border:none;
+  background:var(--accent);color:#000;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+}
+.btn-nuevo-ins:hover{background:var(--accent2);}
+#modal-nuevo-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:800;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#modal-nuevo-overlay.open{opacity:1;pointer-events:all;}
+#modal-nuevo-panel{
+  background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 8px 40px rgba(0,0,0,.18);
+  width:min(500px,95vw);max-height:90vh;overflow-y:auto;
+  transform:translateY(20px);transition:transform .2s;
+}
+#modal-nuevo-overlay.open #modal-nuevo-panel{transform:none;}
+.modal-nuevo-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--line);
+  font-size:15px;font-weight:800;
+}
+.modal-nuevo-body{padding:20px;}
+.btn-eliminar-ins{
+  background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);
+  padding:5px 10px;border-radius:var(--r-sm);font-size:11px;font-weight:700;
+  cursor:pointer;transition:all .15s;font-family:var(--font);
+}
+.btn-eliminar-ins:hover{background:#ffdad8;}
+.custom-tag{
+  display:inline-block;font-size:9px;font-family:var(--mono);
+  background:var(--green-bg);color:var(--green);
+  border:1px solid var(--green-border);padding:1px 5px;border-radius:3px;
+  margin-left:5px;vertical-align:middle;
+}
+
 </style>
 </head>
 <body>
@@ -983,7 +1024,7 @@ function renderInsumos() {
   const q = (document.getElementById('ins-search').value||'').toLowerCase();
   let list = getAllIns();
   if (_insSector) list = list.filter(i => i.sector === _insSector);
-  if (q) list = list.filter(i => i.nombre.toLowerCase().includes(q) || i.proveedor.toLowerCase().includes(q));
+  if (q) list = list.filter(i => i.nombre.toLowerCase().includes(q) || (i.proveedor||'').toLowerCase().includes(q));
   if (_soloAlertas) list = list.filter(i => { const e = calcEstado(i); return e.tipo==='comprar'||e.tipo==='pronto'; });
 
   document.getElementById('insumos-sub').textContent = list.length + ' insumos' + (_insSector?' · '+_insSector:'');

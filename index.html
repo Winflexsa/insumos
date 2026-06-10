@@ -836,6 +836,7 @@ const INSUMOS_BASE = [
 // ══════════════════════════════════════════════
 const BIN_URL = 'https://api.jsonbin.io/v3/b/';
 let state = { compras: [], overrides: {}, customInsumos: [], deletedIds: [] };
+let LOAD_OK=false; // true solo si loadData leyó bien la nube; bloquea saveData si la carga falló
 let _binId = localStorage.getItem('wf_ins_binid') || '69cd868236566621a86e7c09';
 let _apiKey = localStorage.getItem('wf_ins_apikey') || '$2a$10$8p4t41BnTv.9Ls.4kFLhouDMqJGQEd5LQlBYEz8n1y6nH/3dFq27G';
 
@@ -857,15 +858,23 @@ async function loadData() {
     if (d.overrides) state.overrides = d.overrides;
     if (d.customInsumos) state.customInsumos = d.customInsumos;
     if (d.deletedIds) state.deletedIds = d.deletedIds;
+    LOAD_OK = true;
   } catch(e) {
-    toast('Error cargando datos: ' + e.message, 'err');
+    LOAD_OK = false;
+    toast('Error cargando datos: ' + e.message + ' — guardado bloqueado, recargá', 'err');
   }
   hideLoading();
 }
 
 async function saveData() {
   if (!_binId) { toast('Configurá el Bin ID en ⚙️ primero', 'err'); return false; }
+  if (!LOAD_OK) { toast('Guardado bloqueado: la carga falló. Recargá la página.', 'err'); return false; }
   try {
+    // Tripwire: no pisar la nube con compras vacías si la nube tiene datos
+    try {
+      const chk = await fetch(BIN_URL + _binId + '/latest', {headers: getHeaders()});
+      if (chk.ok) { const cur = (await chk.json()).record || {}; if ((cur.compras||[]).length>0 && (state.compras||[]).length===0) { toast('⛔ Guardado BLOQUEADO: dejaría las compras en cero y la nube tiene datos. Recargá la página.', 'err'); return false; } }
+    } catch(_) {}
     const r = await fetch(BIN_URL + _binId, {
       method: 'PUT', headers: getHeaders(true),
       body: JSON.stringify(state)
@@ -1553,6 +1562,7 @@ async function loadDataSilent() {
     if (d.overrides) state.overrides = d.overrides;
     if (d.customInsumos) state.customInsumos = d.customInsumos;
     if (d.deletedIds) state.deletedIds = d.deletedIds;
+    LOAD_OK = true;
   } catch(e) {
     toast('Error al sincronizar: ' + e.message, 'err');
   }

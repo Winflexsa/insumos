@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1f9d57">
 <title>Insumos — Winflex</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 250 160'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2354c184'/%3E%3Cstop offset='1' stop-color='%230c6f30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M44 40 84 128 122 56' fill='none' stroke='url(%23a)' stroke-width='27' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M118 56 158 128 196 52c5-16-11-21-17-7' fill='none' stroke='url(%23a)' stroke-width='27' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -11,7 +13,9 @@
 :root{
   --bg:#f5f7fa; --bg2:#ffffff; --bg3:#eef1f6; --line:#dde2ec;
   --text:#1a2332; --muted:#6b7a99; --dim:#4b5b7a;
-  --accent:#f5a623; --accent2:#c8841a;
+  --brand:#4d4d4d;
+  --accent:#1f9d57; --accent2:#167a40;
+  --accent-soft:rgba(31,157,87,.12);
   --red:#e03c2d; --red-bg:#fff0ee; --red-border:#fbbbb5;
   --green:#1a9e52; --green-bg:#edfbf4; --green-border:#9de6c0;
   --blue:#2563eb; --blue-bg:#eff6ff; --blue-border:#bfdbfe;
@@ -39,11 +43,10 @@ a{color:inherit;text-decoration:none}
 }
 .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .logo-icon{
-  width:34px;height:34px;border-radius:8px;
-  background:var(--accent);color:#000;
+  width:38px;height:34px;
   display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-size:17px;letter-spacing:-1px;
 }
+.logo-icon svg{width:100%;height:100%;display:block}
 .logo-name{font-weight:800;font-size:15px;letter-spacing:.3px}
 .logo-sub{font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1}
 
@@ -54,12 +57,12 @@ nav{display:flex;gap:3px;background:var(--bg3);border-radius:var(--r);padding:3p
   transition:all .15s;white-space:nowrap;
 }
 .nb:hover{color:var(--text);background:var(--line)}
-.nb.on{background:var(--accent);color:#000}
+.nb.on{background:var(--accent);color:#fff}
 .nb .bx{
   background:var(--red);color:#fff;border-radius:8px;
   padding:1px 5px;font-size:10px;font-family:var(--mono);font-weight:700;
 }
-.nb.on .bx{background:rgba(0,0,0,.25);color:#000}
+.nb.on .bx{background:rgba(255,255,255,.28);color:#fff}
 
 /* ── MAIN ───────────────────────────────────────── */
 #main{max-width:1140px;margin:0 auto;padding:22px 20px 60px}
@@ -102,7 +105,7 @@ nav{display:flex;gap:3px;background:var(--bg3);border-radius:var(--r);padding:3p
   transition:all .15s;
 }
 .filt-btn:hover{border-color:var(--muted);color:var(--text)}
-.filt-btn.on{border-color:var(--accent);background:rgba(245,166,35,.12);color:var(--accent)}
+.filt-btn.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 
 /* ── TABLE ───────────────────────────────────────── */
 .tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);-webkit-overflow-scrolling:touch}
@@ -205,11 +208,11 @@ label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bot
   padding:9px 20px;border-radius:var(--r-sm);border:none;
   font-size:13px;font-weight:700;transition:all .15s;
 }
-.btn-primary{background:var(--accent);color:#000}
+.btn-primary{background:var(--accent);color:#fff}
 .btn-primary:hover{background:var(--accent2)}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
-.btn-danger:hover{background:#3a1515}
+.btn-danger:hover{background:#ffdad8}
 .btn-ghost{background:var(--bg3);color:var(--dim);border:1px solid var(--line)}
 .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
 
@@ -293,7 +296,7 @@ label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bot
   cursor:pointer;transition:all .15s;
 }
 .btn-edit-mode:hover{border-color:var(--muted);color:var(--text);}
-.btn-edit-mode.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.btn-edit-mode.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .edit-fields{display:none;}
 .edit-fields.open{display:block;}
 .edit-grid{
@@ -376,39 +379,42 @@ tbody tr.clickable:hover{background:var(--bg3);}
 #login-screen{
   position:fixed;inset:0;z-index:9999;
   background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
 }
 .login-card{
   background:var(--bg2);border:1px solid var(--line);
-  border-radius:var(--r);padding:36px 40px;
-  box-shadow:var(--shadow);width:min(360px,92vw);text-align:center;
+  border-radius:18px;padding:38px 34px 32px;
+  box-shadow:0 8px 40px rgba(20,40,30,.10);width:min(380px,94vw);text-align:center;
 }
-.login-logo{
-  width:52px;height:52px;border-radius:14px;
-  background:var(--accent);color:#000;font-weight:800;font-size:24px;
-  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
-}
-.login-title{font-size:18px;font-weight:800;margin-bottom:4px;}
-.login-sub{font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:24px;}
+/* ── Winflex brand lockup ── */
+.brand-lockup{display:flex;flex-direction:column;align-items:center;margin-bottom:22px}
+.brand-mark{width:74px;height:50px;margin-bottom:6px}
+.brand-mark svg{width:100%;height:100%;display:block}
+.brand-word{display:flex;align-items:flex-end;justify-content:center;line-height:.9}
+.brand-word .wf{font-weight:800;font-size:34px;letter-spacing:-1.5px;color:var(--brand)}
+.brand-word .sa{font-weight:700;font-size:13px;color:var(--brand);margin-left:3px;margin-bottom:3px}
+.brand-tag{font-size:8.5px;font-weight:700;letter-spacing:4px;color:var(--muted);margin-top:3px}
 
+.login-title{font-size:19px;font-weight:800;margin-bottom:3px;}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:22px;}
 
-.pin-display{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
-.pin-dot{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid var(--line);background:transparent;transition:all .1s;
+.pin-input{
+  width:100%;text-align:center;
+  background:var(--bg3);border:1.5px solid var(--line);
+  border-radius:12px;padding:16px 14px;margin-bottom:14px;
+  font-size:24px;letter-spacing:14px;font-family:var(--mono);color:var(--text);
+  outline:none;transition:border-color .15s,box-shadow .15s;
 }
-.pin-dot.filled{background:var(--accent);border-color:var(--accent);}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
-.pin-key{
-  padding:14px 0;border-radius:var(--r-sm);border:1px solid var(--line);
-  background:var(--bg3);font-size:18px;font-weight:700;cursor:pointer;
-  transition:all .1s;font-family:var(--mono);color:var(--text);
+.pin-input::placeholder{letter-spacing:1px;font-size:14px;color:var(--muted)}
+.pin-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn-entrar{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:var(--accent);color:#fff;font-size:15px;font-weight:800;
+  cursor:pointer;transition:background .15s;
 }
-.pin-key:hover{background:var(--line);}
-.pin-key:active{transform:scale(.95);}
-.pin-key.del{font-size:16px;color:var(--muted);}
-.pin-key.empty{border:none;background:none;cursor:default;pointer-events:none;}
-.login-error{color:var(--red);font-size:12px;font-family:var(--mono);height:16px;}
+.btn-entrar:hover{background:var(--accent2)}
+.btn-entrar:active{transform:scale(.99)}
+.login-error{color:var(--red);font-size:12.5px;font-weight:600;height:18px;margin-top:12px;}
 @keyframes shake{
   0%,100%{transform:translateX(0)}
   20%{transform:translateX(-8px)}40%{transform:translateX(8px)}
@@ -420,7 +426,7 @@ tbody tr.clickable:hover{background:var(--bg3);}
 /* ─── NUEVO INSUMO / ELIMINAR ───────────────────────────────── */
 .btn-nuevo-ins{
   padding:8px 16px;border-radius:var(--r-sm);border:none;
-  background:var(--accent);color:#000;font-size:13px;font-weight:700;
+  background:var(--accent);color:#fff;font-size:13px;font-weight:700;
   cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;
   flex-shrink:0;
 }
@@ -461,38 +467,40 @@ tbody tr.clickable:hover{background:var(--bg3);}
 </head>
 <body>
 
+<!-- ─── LOGO SPRITE (Winflex W mark) ─────────────────────────── -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="wfg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#54c184"/>
+      <stop offset="1" stop-color="#0c6f30"/>
+    </linearGradient>
+    <symbol id="wf-mark" viewBox="0 0 250 160">
+      <path d="M44 40 84 128 122 56" fill="none" stroke="url(#wfg)" stroke-width="27" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M118 56 158 128 196 52c5-16-11-21-17-7" fill="none" stroke="url(#wfg)" stroke-width="27" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
 <!-- ─── LOGIN ─────────────────────────────────────────────────── -->
 <div id="login-screen">
   <div class="login-card" id="login-card">
-    <div class="login-logo">W</div>
+    <div class="brand-lockup">
+      <div class="brand-mark"><svg viewBox="0 0 250 160"><use href="#wf-mark"/></svg></div>
+      <div class="brand-word"><span class="wf">winflex</span><span class="sa">s.a.</span></div>
+      <div class="brand-tag">ENVASES ESPECIALES</div>
+    </div>
     <div class="login-title">Winflex Insumos</div>
-    <div class="login-sub">Ingresá tu PIN para acceder</div>
-<div class="pin-display">
-      <div class="pin-dot" id="dot-0"></div>
-      <div class="pin-dot" id="dot-1"></div>
-      <div class="pin-dot" id="dot-2"></div>
-      <div class="pin-dot" id="dot-3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-key" onclick="pinKey('1')">1</button>
-      <button class="pin-key" onclick="pinKey('2')">2</button>
-      <button class="pin-key" onclick="pinKey('3')">3</button>
-      <button class="pin-key" onclick="pinKey('4')">4</button>
-      <button class="pin-key" onclick="pinKey('5')">5</button>
-      <button class="pin-key" onclick="pinKey('6')">6</button>
-      <button class="pin-key" onclick="pinKey('7')">7</button>
-      <button class="pin-key" onclick="pinKey('8')">8</button>
-      <button class="pin-key" onclick="pinKey('9')">9</button>
-      <button class="pin-key empty"></button>
-      <button class="pin-key" onclick="pinKey('0')">0</button>
-      <button class="pin-key del" onclick="pinDel()">⌫</button>
-    </div>
+    <div class="login-sub">Ingresá tu PIN para continuar</div>
+    <input class="pin-input" id="pin-input" type="password" inputmode="numeric"
+           maxlength="6" autocomplete="off" placeholder="••••"
+           oninput="onPinInput()" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="btn-entrar" onclick="checkPin()">Entrar</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
 
 <div id="loading">
-  <div class="logo-icon" style="width:48px;height:48px;border-radius:12px;font-size:22px;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#000;font-weight:800">W</div>
+  <div style="width:64px;height:42px"><svg viewBox="0 0 250 160" style="width:100%;height:100%"><use href="#wf-mark"/></svg></div>
   <div class="spinner"></div>
   <div class="loading-text">Cargando insumos…</div>
 </div>
@@ -500,7 +508,7 @@ tbody tr.clickable:hover{background:var(--bg3);}
 <div id="app" style="display:none">
   <div id="header">
     <div class="logo">
-      <div class="logo-icon">W</div>
+      <div class="logo-icon"><svg viewBox="0 0 250 160"><use href="#wf-mark"/></svg></div>
       <div>
         <div class="logo-name">Winflex S.A.</div>
         <div class="logo-sub">Gestión de Insumos</div>
@@ -710,29 +718,23 @@ tbody tr.clickable:hover{background:var(--bg3);}
 <script>
 // ─── LOGIN PIN ────────────────────────────────────────────────
 const USERS={'Jonathan':'3080','Juan Manuel':'0056','Georgina':'0102','Matias':'1540'};
-let _pinUser=null,_pinBuffer='',_currentUser=null;
+let _currentUser=null;
 
-function pinKey(k){
-  if(_pinBuffer.length>=4)return;
-  _pinBuffer+=k; updateDots();
-  if(_pinBuffer.length===4) setTimeout(checkPin,150);
-}
-function pinDel(){
-  _pinBuffer=_pinBuffer.slice(0,-1); updateDots();
+function onPinInput(){
+  const el=document.getElementById('pin-input');
+  el.value=el.value.replace(/\D/g,'');           // solo dígitos
   document.getElementById('login-error').textContent='';
 }
-function updateDots(){
-  for(let i=0;i<4;i++) document.getElementById('dot-'+i).classList.toggle('filled',i<_pinBuffer.length);
-}
 function checkPin(){
-  const found=Object.keys(USERS).find(u=>USERS[u]===_pinBuffer);
+  const buf=document.getElementById('pin-input').value;
+  const found=Object.keys(USERS).find(u=>USERS[u]===buf);
   if(found){
     _currentUser=found;
     sessionStorage.setItem('wf_user',found);
     document.getElementById('login-screen').style.display='none';
     loadData();
   } else {
-    _pinBuffer=''; updateDots();
+    const el=document.getElementById('pin-input'); el.value='';
     document.getElementById('login-error').textContent='PIN incorrecto ✕';
     const card=document.getElementById('login-card');
     card.classList.remove('login-shake');
@@ -740,6 +742,8 @@ function checkPin(){
     card.classList.add('login-shake');
   }
 }
+// Foco automático en el input al cargar
+window.addEventListener('load',()=>{const el=document.getElementById('pin-input'); if(el) el.focus();});
 // Si ya autenticó en esta sesión, saltar pantalla
 (function(){
   const saved=sessionStorage.getItem('wf_user');

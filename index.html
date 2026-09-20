@@ -34,6 +34,8 @@
     ajusta();window.addEventListener('resize',ajusta);window.addEventListener('orientationchange',function(){setTimeout(ajusta,250)});}
 }catch(e){}})();
 </script>
+<link rel="manifest" href="./manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -1487,6 +1489,8 @@ function wfVista(v){ try { localStorage.setItem('wf_vista', v); } catch(_) {} co
   document.querySelectorAll('#pg-insumos .filt-btn').forEach(b => { const t = b.textContent.trim(); if (full[t]) b.textContent = full[t]; });
   const ls = document.querySelector('.logo-sub'); if (ls) ls.textContent = 'Insumos';
 })();
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
 // ── INIT ───────────────────────────────────────
 loadData();
